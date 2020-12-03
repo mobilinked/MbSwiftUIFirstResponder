@@ -4,7 +4,7 @@
 //
 //  Created by QuickPlan.app on 2020/12/3.
 //
-#if os(iOS)
+#if os(macOS)
 import SwiftUI
 
 // MARK: - demo
