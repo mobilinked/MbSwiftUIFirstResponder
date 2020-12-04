@@ -15,6 +15,7 @@ TextEditor(text: $notes)
 ```
 
 Tap below the image to play the demo video.
+
 [![First Responder Demo](https://img.youtube.com/vi/zcUd2grpoz4/0.jpg)](https://www.youtube.com/watch?v=zcUd2grpoz4)
 
 ### Goal: 
