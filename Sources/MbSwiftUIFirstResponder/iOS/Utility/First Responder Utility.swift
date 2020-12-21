@@ -11,7 +11,7 @@ extension UIView {
     func frFindLinkedField<Field: FirstResponderableField>() -> Field? {
         // for a interoperability view (nsview), SwiftUI may enclose it in multiple levels of other host view, here is to find the root host view
         guard let rootSwiftUIHostView = self.frFindHostSwiftUIView() else { return nil }
-        // and the actual linked field is about at the same tree hirachy
+        // and the actual linked field is about at the same tree hierarchy
         // here to find the linked field from the parent of the root host view
         guard let containerView = rootSwiftUIHostView.superview else { return nil }
         let location = rootSwiftUIHostView.frame.origin
@@ -43,7 +43,7 @@ extension UIView {
         }
     }
     
-    /// Explore up to the parent hirachy, to check the view with multiple subviews
+    /// Explore up to the parent hierarchy, to check the view with multiple subviews
     private func frFindHostSwiftUIView() -> UIView? {
         if let parent = self.superview {
             if parent.subviews.count > 1 {
