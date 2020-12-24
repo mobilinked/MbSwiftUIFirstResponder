@@ -73,6 +73,12 @@ final class MbFRHackNSView<Field: FirstResponderableField>: NSView, FrEventObser
         self.wantsLayer = true
     }
     
+    deinit {
+        if let window = self.window {
+            stopTrackRelatedEvents(in: window)
+        }
+    }
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -82,16 +88,18 @@ final class MbFRHackNSView<Field: FirstResponderableField>: NSView, FrEventObser
         super.viewDidMoveToWindow()
         
         guard field == nil else { return }
-        // this hack view will be as the background of the SwiftUI field (TextField, TextEditor), so here to find the linked SwiftUI field
-        field = self.frFindLinkedField()
+        DispatchQueue.main.async {[weak self] in
+            guard let `self` = self else { return }
+            // this hack view will be as the background of the SwiftUI field (TextField, TextEditor), so here to find the linked SwiftUI field
+            self.field = self.frFindLinkedField()
         
-        guard field != nil else { return }
-        guard let window = self.window else { return }
-        trackRelatedEvents(in: window)
+            guard let window = self.window else { return }
+            if let tf = self.field {
+                self.trackRelatedEvents(in: window)
         
-        DispatchQueue.main.async { [weak self] in
-            if let initialFirstResponder = self?.initialFirstResponderStatus, let events = self?.resignableUserOperations, let tf = self?.field, let window = self?.window {
-                self?._update(isFirstResponder: initialFirstResponder, newResignableUserOperations: events, of: tf, in: window)
+                let initialFirstResponder = self.initialFirstResponderStatus
+                let events = self.resignableUserOperations
+                self._update(isFirstResponder: initialFirstResponder, newResignableUserOperations: events, of: tf, in: window)
             }
         }
     }
@@ -105,6 +113,13 @@ final class MbFRHackNSView<Field: FirstResponderableField>: NSView, FrEventObser
         else {
             let coordinator = FRWindowEventPublisher(from: self)
             window.frCoordinator = coordinator
+        }
+    }
+    
+    // stop observe the events from the window
+    private func stopTrackRelatedEvents(in window: NSWindow) {
+        if let coordinator = window.frCoordinator {
+            coordinator.remove(observer: self)
         }
     }
     
