@@ -19,31 +19,36 @@ struct MbFRHackView<ID: Hashable, Field: FirstResponderableField>: NSViewReprese
 //    }
     
     private let resignableUserOperations: Field.ResignableUserOperations
+    private let didBackViewLoaded: ((Field) -> Void)?
     
-    init(id: ID, firstResponder: Binding<ID?>, resignableUserOperations: Field.ResignableUserOperations) {
+    init(id: ID, firstResponder: Binding<ID?>, resignableUserOperations: Field.ResignableUserOperations, didBackViewLoaded: ((Field) -> Void)?) {
 //        print("init")
         self.id = id
         self._firstResponder = firstResponder
         self.resignableUserOperations = resignableUserOperations
+        self.didBackViewLoaded = didBackViewLoaded
     }
     
     func makeNSView(context: Context) -> MbFRHackNSView<Field> {
 //        print("makeNSView")
         return MbFRHackNSView(
             isFirstResponder: id == firstResponder,
-            eventsAllowedToResignFirstResponder: resignableUserOperations) { focused in
-            // change the binding value after the first responder status changed by windows event (NOT changed programmaly)
-            if focused {
-                if firstResponder != id {
-                    firstResponder = id
+            eventsAllowedToResignFirstResponder: resignableUserOperations,
+            firstResponderDidChangedByEvent: { focused in
+                // change the binding value after the first responder status changed by windows event (NOT changed programmaly)
+                if focused {
+                    if firstResponder != id {
+                        firstResponder = id
+                    }
                 }
-            }
-            else {
-                if firstResponder == id {
-                    firstResponder = nil
+                else {
+                    if firstResponder == id {
+                        firstResponder = nil
+                    }
                 }
-            }
-        }
+            },
+            didBackViewLoaded: didBackViewLoaded
+        )
     }
     
     func updateNSView(_ nsView: MbFRHackNSView<Field>, context: Context) {
@@ -56,6 +61,7 @@ final class MbFRHackNSView<Field: FirstResponderableField>: NSView, FrEventObser
     private weak var field: Field? = nil
     private let initialFirstResponderStatus: Bool
     private var resignableUserOperations: Field.ResignableUserOperations
+    private let didBackViewLoaded: ((Field) -> Void)?
     
     // use the monitor if the first responder changed by the window event (NOT changed programmaly)
     // for example, click outside the field, the text field will resign the first responder
@@ -65,10 +71,12 @@ final class MbFRHackNSView<Field: FirstResponderableField>: NSView, FrEventObser
     init(
         isFirstResponder: Bool,
         eventsAllowedToResignFirstResponder: Field.ResignableUserOperations,
-        firstResponderDidChangedByEvent: @escaping (Bool) -> Void) {
+        firstResponderDidChangedByEvent: @escaping (Bool) -> Void,
+        didBackViewLoaded: ((Field) -> Void)?) {
         self.initialFirstResponderStatus = isFirstResponder
         self.resignableUserOperations = eventsAllowedToResignFirstResponder
         self.firstResponderDidChangedByEvent = firstResponderDidChangedByEvent
+        self.didBackViewLoaded = didBackViewLoaded
         super.init(frame: .zero)
         self.wantsLayer = true
     }
@@ -95,6 +103,7 @@ final class MbFRHackNSView<Field: FirstResponderableField>: NSView, FrEventObser
         
             guard let window = self.window else { return }
             if let tf = self.field {
+                self.didBackViewLoaded?(tf)
                 self.trackRelatedEvents(in: window)
         
                 let initialFirstResponder = self.initialFirstResponderStatus
