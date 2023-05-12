@@ -1,4 +1,10 @@
 //
+//  ContentView.swift
+//  Demo
+//
+//  Created by Dev on 2023/5/12.
+//
+//
 //  DemoView.swift
 //  MbSwiftFirstResponder
 //
@@ -11,11 +17,13 @@ import MbSwiftUIFirstResponder
 struct DemoView: View {
     @State var name: String = ""
     @State var email: String = ""
+    @State var password: String = ""
     @State var notes: String = ""
     
     enum FirstResponders: Int {
         case name
         case email
+        case password
         case notes
     }
     @State var firstResponder: FirstResponders? = nil
@@ -28,6 +36,9 @@ struct DemoView: View {
                 
                 TextField("Email", text: $email)
                     .firstResponder(id: FirstResponders.email, firstResponder: $firstResponder, resignableUserOperations: .all)
+                
+                SecureField("Password", text: $password)
+                    .firstResponder(id: FirstResponders.password, firstResponder: $firstResponder, resignableUserOperations: .all)
 
                 TextEditor(text: $notes)
                     .firstResponder(id: FirstResponders.notes, firstResponder: $firstResponder, resignableUserOperations: .all)
@@ -46,6 +57,9 @@ struct DemoView: View {
                     }
                     Button("Email") {
                         firstResponder = .email
+                    }
+                    Button("Password") {
+                        firstResponder = .password
                     }
                     Button("Notes") {
                         firstResponder = .notes

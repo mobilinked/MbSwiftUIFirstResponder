@@ -1,10 +1,11 @@
 //
-//  DemoView.swift
-//  MbSwiftFirstResponder
+//  ContentView.swift
+//  Demo
 //
-//  Created by QuickPlan.app on 2020/12/3.
+//  Created by Dev on 2023/5/12.
 //
 #if os(macOS)
+
 import SwiftUI
 import MbSwiftUIFirstResponder
 
@@ -12,8 +13,15 @@ import MbSwiftUIFirstResponder
 struct DemoView: View {
     @State var name: String = ""
     @State var email: String = ""
+    @State var password: String = ""
     @State var notes: String = ""
     
+    enum FirstResponders: Int {
+        case name
+        case email
+        case password
+        case notes
+    }
     @State var firstResponder: FirstResponders? = nil
     
     var body: some View {
@@ -35,6 +43,15 @@ struct DemoView: View {
                     firstResponder = .email
                 }
             }
+            
+            HStack {
+                SecureField("Password", text: $password)
+                    .firstResponder(id: FirstResponders.password, firstResponder: $firstResponder, resignableUserOperations: .all)
+
+                Button("Edit") {
+                    firstResponder = .password
+                }
+            }
 
             HStack {
                 TextEditor(text: $notes)
@@ -54,18 +71,12 @@ struct DemoView: View {
         .padding()
         .frame(width: 480)
     }
-    
-    enum FirstResponders: Int {
-        case name
-        case email
-        case notes
-    }
 }
 
-// MARK: - preview
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         DemoView()
     }
 }
+
 #endif
