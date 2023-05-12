@@ -6,6 +6,7 @@
 //
 #if os(macOS)
 import SwiftUI
+import MbSwiftUIFirstResponder
 
 // MARK: - demo
 struct DemoView: View {

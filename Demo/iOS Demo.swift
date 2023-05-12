@@ -6,6 +6,7 @@
 //
 #if os(iOS)
 import SwiftUI
+import MbSwiftUIFirstResponder
 
 struct DemoView: View {
     @State var name: String = ""
